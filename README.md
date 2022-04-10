@@ -1,4 +1,4 @@
-# wasd-scroller-chrome-extension
+# wasd-scroller-Chrome/Edge-extension
 
 I dont know what happned to our WASD scroller extension which was https://chrome.google.com/webstore/detail/bnclefcgenjnibloiidmhekpljjidfjh i saved the code here
 
