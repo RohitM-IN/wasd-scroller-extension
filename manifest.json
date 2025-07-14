@@ -1,15 +1,24 @@
 {
-   "background": {
-      "persistent": true,
-      "scripts": [ "background.js" ]
-   },
-   "content_scripts": [ {
-      "js": [ "content.js" ],
-      "matches": [ "*://*/*" ]
-   } ],
-   "description": "Allows users to scroll using W|A|S|D keys. Double-tap CTRL to enable/disable.",
-   "manifest_version": 2,
+   "manifest_version": 3,
    "name": "WASD Scroller NEW",
-   "permissions": [ "input", "background", "notifications", "storage" ],
-   "version": "1.0"
-}
+   "version": "1.0",
+   "description": "Allows users to scroll using W|A|S|D keys. Double-tap CTRL to enable/disable.",
+   "permissions": [
+     "storage",
+     "scripting"
+   ],
+   "background": {
+     "service_worker": "background.js"
+   },
+   "content_scripts": [
+     {
+       "matches": ["<all_urls>"],
+       "js": ["content.js"]
+     }
+   ],
+   "action": {
+     "default_popup": "popup.html"
+   },
+   "host_permissions": ["<all_urls>"]
+ }
+ 

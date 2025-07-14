@@ -1,85 +1,73 @@
-var wasdScroller = {
+let wasdScroller = {
 	initialized: false,
 	scrollIncrement: 100,
 	ctrlCount: 0,
+	active: true,
 
-	initialize: function() {
-		chrome.storage.sync.get('scrollIncrement', this.setScrollIncrement);	
-		chrome.storage.sync.get('active', this.setActive);
-	
-		this.initialized = true;	
-	},
-
-
-	setScrollIncrement: function(data) {
-		if(data.scrollIncrement != undefined){
-			wasdScroller.scrollIncrement = data.scrollIncrement;
-		}	
-
-		chrome.storage.sync.set({'scrollIncrement': wasdScroller.scrollIncrement }, function(){
-			//message('settings saved')
-		});
-	
-	},
-
-	getScrollIncrement: function() {
-		return wasdScroller.scrollIncrement;
-	},
-
-	setActive: function(data) {
-		if(data.active != undefined){
-			wasdScroller.active = data.active;
-		}
-
-		chrome.storage.sync.set({'active': data.active}, function(){
-			//message('settings saved');
+	initialize: function () {
+		chrome.storage.sync.get(['scrollIncrement', 'active'], (data) => {
+			if (data.scrollIncrement !== undefined) {
+				this.scrollIncrement = data.scrollIncrement;
+			}
+			if (data.active !== undefined) {
+				this.active = data.active;
+			}
+			this.initialized = true;
 		});
 	},
 
-	getActive: function() {
-		return wasdScroller.active;
+	getScrollIncrement: function () {
+		return this.scrollIncrement;
+	},
+
+	getActive: function () {
+		return this.active;
+	},
+
+	setActive: function (value) {
+		this.active = value;
+		chrome.storage.sync.set({ active: value });
 	}
 };
 
 wasdScroller.initialize();
-wasdScroller.setActive({active: true});
 
-chrome.extension.onMessage.addListener(function(request,sender,sendResponse) {
-	var response = {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	let response = {
 		active: wasdScroller.getActive(),
 		keycode: request.keycode,
 		x: 0,
-		y: 0,
+		y: 0
 	};
 
-	if(request.keycode == 17){
-		if(++wasdScroller.ctrlCount > 1){
-			wasdScroller.setActive({active: !wasdScroller.getActive()}, function() { } );		
+	if (request.keycode === 17) {
+		if (++wasdScroller.ctrlCount > 1) {
+			wasdScroller.setActive(!wasdScroller.getActive());
 			wasdScroller.ctrlCount = 0;
 		}
-	}else {
+	} else {
 		wasdScroller.ctrlCount = 0;
 	}
 
-	if(wasdScroller.active == false){
+	if (!wasdScroller.getActive()) {
 		sendResponse(response);
 		return true;
 	}
 
-    switch(request.keycode) {
-        case 87: // w
-            response.y = wasdScroller.getScrollIncrement() * -1;
+	switch (request.keycode) {
+		case 87: // w
+			response.y = wasdScroller.getScrollIncrement() * -1;
 			break;
-        case 65: // a
-            response.x = wasdScroller.getScrollIncrement() * -1;
+		case 65: // a
+			response.x = wasdScroller.getScrollIncrement() * -1;
 			break;
-        case 83: // s
+		case 83: // s
 			response.y = wasdScroller.getScrollIncrement();
 			break;
-        case 68: // d
+		case 68: // d
 			response.x = wasdScroller.getScrollIncrement();
 			break;
-		default: 
+		default:
 			response.active = false;
 			break;
 	}
